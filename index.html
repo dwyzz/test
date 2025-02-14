@@ -33,6 +33,7 @@
 
         p {
             font-size: 1.2em;
+            display: none;
         }
 
         .heart {
@@ -41,14 +42,25 @@
             margin: 20px 0;
         }
 
-        .message {
-            font-size: 1.1em;
-            margin-bottom: 20px;
-        }
-
         .signature {
             font-size: 1.1em;
             color: #666;
+            display: none;
+        }
+
+        button {
+            background-color: #ff0066;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 1em;
+            border-radius: 10px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+
+        button:hover {
+            background-color: #ff3385;
         }
     </style>
 </head>
@@ -56,8 +68,21 @@
     <div class="card">
         <h1>Chúc mừng Valentine!</h1>
         <div class="heart">❤️</div>
-        <p class="message">Chúc bố mẹ một ngày Valentine đầy yêu thương và hạnh phúc! Cảm ơn bố mẹ đã luôn dành tình cảm và sự chăm sóc cho con. Yêu thương luôn ở bên bố mẹ!</p>
-        <p class="signature">Con yêu, [Duy]</p>
+
+        <!-- Nội dung chúc sẽ ẩn đi và chỉ hiện khi nhấn nút -->
+        <p id="message">Chúc bố mẹ một ngày Valentine đầy yêu thương và hạnh phúc! Cảm ơn bố mẹ đã luôn dành tình cảm và sự chăm sóc cho con. Yêu thương luôn ở bên bố mẹ!</p>
+        <p class="signature" id="signature">Con yêu, [Duy]</p>
+
+        <!-- Nút bấm để hiển thị lời chúc -->
+        <button onclick="showMessage()">Bấm vào để hiện lời chúc</button>
     </div>
+
+    <script>
+        // Hàm để hiển thị nội dung lời chúc
+        function showMessage() {
+            document.getElementById("message").style.display = "block";
+            document.getElementById("signature").style.display = "block";
+        }
+    </script>
 </body>
 </html>
