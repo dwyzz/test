@@ -171,10 +171,9 @@
                 obstacleCount++;
                 obstacle.isPassed = true;
 
-                // Kiểm tra nếu vượt đủ 10 chướng ngại vật
-                if (obstacleCount >= 10) {
-                    showValentineMessage();
-                    clearInterval(obstacleMoveInterval);
+                // Kiểm tra nếu vượt đủ 5 chướng ngại vật
+                if (obstacleCount >= 5) {
+                    stopGame(obstacleMoveInterval);
                 }
             }
 
@@ -208,11 +207,12 @@
         }, 20);
     }
 
-    // Hàm hiển thị lời chúc Valentine
-    function showValentineMessage() {
+    // Hàm hiển thị lời chúc Valentine và dừng trò chơi
+    function stopGame(obstacleMoveInterval) {
         valentineMessage.style.display = 'block';
         isGameOver = true;
         clearInterval(obstacleInterval);
+        clearInterval(obstacleMoveInterval);
         document.removeEventListener('keydown', jumpListener);
     }
 
