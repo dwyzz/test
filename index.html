@@ -84,6 +84,24 @@
             background-color: #ff3385;
         }
 
+        /* Nút nhảy */
+        .jump-button {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            background-color: #ff0066;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 18px;
+            border-radius: 20px;
+            cursor: pointer;
+        }
+
+        .jump-button:hover {
+            background-color: #ff3385;
+        }
+
     </style>
 </head>
 <body>
@@ -95,12 +113,16 @@
         <p>Chúc bố mẹ một ngày Valentine đầy yêu thương và hạnh phúc! Yêu bố mẹ rất nhiều! ❤️</p>
         <p class="signature">Con yêu, Duy</p>
     </div>
+
+    <!-- Nút nhảy -->
+    <button class="jump-button" id="jumpButton">Nhảy</button>
 </div>
 
 <script>
     const player = document.getElementById('player');
     const gameContainer = document.getElementById('gameContainer');
     const valentineMessage = document.getElementById('valentineMessage');
+    const jumpButton = document.getElementById('jumpButton');
     let obstacleCount = 0;
     let isJumping = false;
     let isGameOver = false;
@@ -188,6 +210,9 @@
     };
 
     document.addEventListener('keydown', jumpListener);
+
+    // Sự kiện click của nút nhảy
+    jumpButton.addEventListener('click', jump);
 </script>
 
 </body>
