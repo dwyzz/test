@@ -51,7 +51,7 @@
             to { right: 100%; }
         }
 
-        .valentine-message {
+        .valentine-message, .game-over-message {
             display: none;
             position: absolute;
             top: 50%;
@@ -133,6 +133,13 @@
         <p class="signature">Con yêu, Duy</p>
     </div>
 
+    <!-- Thêm thông báo khi thua -->
+    <div class="game-over-message" id="gameOverMessage">
+        <h1>Bạn đã thua!</h1>
+        <p>Hãy thử lại nào!</p>
+        <button id="restartButton">Chơi lại</button>
+    </div>
+
     <!-- Nút nhảy -->
     <button class="jump-button" id="jumpButton">Nhảy</button>
 
@@ -144,8 +151,10 @@
     const player = document.getElementById('player');
     const gameContainer = document.getElementById('gameContainer');
     const valentineMessage = document.getElementById('valentineMessage');
+    const gameOverMessage = document.getElementById('gameOverMessage');
     const jumpButton = document.getElementById('jumpButton');
     const startButton = document.getElementById('startButton');
+    const restartButton = document.getElementById('restartButton');
     let obstacleCount = 0;
     let isJumping = false;
     let isGameOver = false;
@@ -221,6 +230,7 @@
         obstacleCount = 0;
         isGameOver = false;
         valentineMessage.style.display = 'none';
+        gameOverMessage.style.display = 'none'; // Ẩn thông báo thua
         const obstacles = document.querySelectorAll('.obstacle');
         obstacles.forEach(obstacle => obstacle.remove());
         startButton.style.display = 'none';
@@ -230,12 +240,11 @@
 
     // Hàm game over
     function gameOver(obstacleMoveInterval) {
-        alert('Game Over! Bạn đã va phải chướng ngại vật!');
         isGameOver = true;
         clearInterval(obstacleMoveInterval);
         clearInterval(obstacleInterval);
         document.removeEventListener('keydown', jumpListener);
-        startButton.style.display = 'block'; // Hiển thị lại nút bắt đầu để chơi lại
+        gameOverMessage.style.display = 'block'; // Hiển thị thông báo thua
     }
 
     // Lắng nghe sự kiện phím để cho nhân vật nhảy
@@ -253,8 +262,8 @@
     // Sự kiện click của nút bắt đầu
     startButton.addEventListener('click', resetGame);
 
-    // Ẩn nút nhảy và nút bắt đầu khi mới vào trò chơi
-    jumpButton.style.display = 'block'; // Cho phép nút nhảy hoạt động khi bắt đầu trò chơi
+    // Sự kiện click của nút chơi lại
+    restartButton.addEventListener('click', resetGame);
 </script>
 
 </body>
