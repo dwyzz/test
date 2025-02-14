@@ -102,6 +102,25 @@
             background-color: #ff3385;
         }
 
+        /* Nút bắt đầu */
+        .start-button {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #ff0066;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 18px;
+            border-radius: 20px;
+            cursor: pointer;
+        }
+
+        .start-button:hover {
+            background-color: #ff3385;
+        }
+
     </style>
 </head>
 <body>
@@ -116,6 +135,9 @@
 
     <!-- Nút nhảy -->
     <button class="jump-button" id="jumpButton">Nhảy</button>
+
+    <!-- Nút bắt đầu -->
+    <button class="start-button" id="startButton">Bắt đầu</button>
 </div>
 
 <script>
@@ -123,9 +145,11 @@
     const gameContainer = document.getElementById('gameContainer');
     const valentineMessage = document.getElementById('valentineMessage');
     const jumpButton = document.getElementById('jumpButton');
+    const startButton = document.getElementById('startButton');
     let obstacleCount = 0;
     let isJumping = false;
     let isGameOver = false;
+    let obstacleInterval;
 
     // Hàm tạo chướng ngại vật
     function createObstacle() {
@@ -133,13 +157,13 @@
         obstacle.classList.add('obstacle');
         gameContainer.appendChild(obstacle);
 
-        let obstacleInterval = setInterval(() => {
+        let obstacleMoveInterval = setInterval(() => {
             const obstacleRect = obstacle.getBoundingClientRect();
             const playerRect = player.getBoundingClientRect();
 
             // Kiểm tra va chạm
             if (!isJumping && obstacleRect.right > playerRect.left && obstacleRect.left < playerRect.right && obstacleRect.bottom > playerRect.top) {
-                gameOver(obstacleInterval);
+                gameOver(obstacleMoveInterval);
             }
 
             // Khi vượt qua chướng ngại vật
@@ -149,13 +173,14 @@
 
                 // Kiểm tra nếu vượt đủ 10 chướng ngại vật
                 if (obstacleCount >= 10) {
-                    showValentineMessage(obstacleInterval);
+                    showValentineMessage();
+                    clearInterval(obstacleMoveInterval);
                 }
             }
 
             // Xóa chướng ngại vật khi nó đi ra ngoài màn hình
             if (obstacleRect.right <= 0) {
-                clearInterval(obstacleInterval);
+                clearInterval(obstacleMoveInterval);
                 obstacle.remove();
             }
         }, 20);
@@ -184,23 +209,34 @@
     }
 
     // Hàm hiển thị lời chúc Valentine
-    function showValentineMessage(obstacleInterval) {
+    function showValentineMessage() {
         valentineMessage.style.display = 'block';
-        clearInterval(obstacleInterval);
         isGameOver = true;
+        clearInterval(obstacleInterval);
         document.removeEventListener('keydown', jumpListener);
+    }
+
+    // Hàm reset trò chơi
+    function resetGame() {
+        obstacleCount = 0;
+        isGameOver = false;
+        valentineMessage.style.display = 'none';
+        const obstacles = document.querySelectorAll('.obstacle');
+        obstacles.forEach(obstacle => obstacle.remove());
+        startButton.style.display = 'none';
+        document.addEventListener('keydown', jumpListener);
+        obstacleInterval = setInterval(createObstacle, 2000);
     }
 
     // Hàm game over
-    function gameOver(obstacleInterval) {
+    function gameOver(obstacleMoveInterval) {
         alert('Game Over! Bạn đã va phải chướng ngại vật!');
         isGameOver = true;
+        clearInterval(obstacleMoveInterval);
         clearInterval(obstacleInterval);
         document.removeEventListener('keydown', jumpListener);
+        startButton.style.display = 'block'; // Hiển thị lại nút bắt đầu để chơi lại
     }
-
-    // Tạo chướng ngại vật mỗi 2 giây
-    const obstacleInterval = setInterval(createObstacle, 2000);
 
     // Lắng nghe sự kiện phím để cho nhân vật nhảy
     const jumpListener = (e) => {
@@ -213,6 +249,12 @@
 
     // Sự kiện click của nút nhảy
     jumpButton.addEventListener('click', jump);
+
+    // Sự kiện click của nút bắt đầu
+    startButton.addEventListener('click', resetGame);
+
+    // Ẩn nút nhảy và nút bắt đầu khi mới vào trò chơi
+    jumpButton.style.display = 'block'; // Cho phép nút nhảy hoạt động khi bắt đầu trò chơi
 </script>
 
 </body>
