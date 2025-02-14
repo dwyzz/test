@@ -3,55 +3,68 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Thiệp Chúc Valentine</title>
+    <title>Trò chơi vượt chướng ngại vật - Valentine</title>
     <style>
         body {
             font-family: 'Arial', sans-serif;
             background-color: #ffcccc;
             margin: 0;
             padding: 0;
+            overflow: hidden;
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
+        }
+
+        #gameArea {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            background-color: #f0f0f0;
             overflow: hidden;
         }
 
-        .card {
-            background-color: white;
-            border-radius: 20px;
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-            width: 350px;
-            text-align: center;
-            padding: 20px;
-            color: #333;
-            position: relative;
-            z-index: 2;
+        #player {
+            width: 50px;
+            height: 50px;
+            background-color: #ff0066;
+            position: absolute;
+            bottom: 0;
+            left: 50px;
         }
 
-        h1 {
-            color: #ff0066;
+        .obstacle {
+            width: 30px;
+            height: 30px;
+            background-color: #333;
+            position: absolute;
+            bottom: 0;
+            animation: moveObstacle 3s linear infinite;
+        }
+
+        @keyframes moveObstacle {
+            from {
+                right: -30px;
+            }
+            to {
+                right: 100vw;
+            }
+        }
+
+        #message {
+            display: none;
+            position: absolute;
+            top: 40%;
+            left: 50%;
+            transform: translate(-50%, -50%);
             font-size: 2em;
-        }
-
-        p {
-            font-size: 1.2em;
-            display: none;
-        }
-
-        .heart {
             color: #ff0066;
-            font-size: 4em;
-            margin: 20px 0;
-        }
-
-        .signature {
-            font-size: 1.1em;
-            color: #666;
-            display: none;
+            text-align: center;
         }
 
         button {
+            display: none;
             background-color: #ff0066;
             color: white;
             border: none;
@@ -62,82 +75,80 @@
             margin-top: 20px;
         }
 
-        button:hover {
-            background-color: #ff3385;
-        }
-
-        /* Hiệu ứng trái tim rơi */
-        .heart-fall {
-            position: fixed;
-            top: -10px;
-            width: 25px;
-            height: 25px;
-            background-color: #ff0066;
-            clip-path: polygon(50% 0%, 100% 37%, 80% 100%, 50% 80%, 20% 100%, 0% 37%);
-            animation: fall 5s infinite;
-            opacity: 0.8;
-            z-index: 1;
-        }
-
-        @keyframes fall {
-            0% {
-                transform: translateY(0) rotate(0deg);
-                opacity: 1;
-            }
-            100% {
-                transform: translateY(100vh) rotate(360deg);
-                opacity: 0;
-            }
-        }
-
-        /* Đặt vị trí ngẫu nhiên */
-        .heart-fall:nth-child(odd) {
-            animation-duration: 4s;
-        }
-
-        .heart-fall:nth-child(even) {
-            animation-duration: 6s;
-            animation-delay: 2s;
-        }
-
     </style>
 </head>
 <body>
-    <div class="card">
-        <h1>Chúc mừng Valentine!</h1>
-        <div class="heart">❤️</div>
-
-        <!-- Nội dung chúc sẽ ẩn đi và chỉ hiện khi nhấn nút -->
-        <p id="message">Chúc bố mẹ một ngày Valentine đầy yêu thương và hạnh phúc! Cảm ơn bố mẹ đã luôn dành tình cảm và sự chăm sóc cho con. Yêu thương luôn ở bên bố mẹ!</p>
-        <p class="signature" id="signature">Con yêu, [Tên của bạn]</p>
-
-        <!-- Nút bấm để hiển thị lời chúc -->
-        <button onclick="showMessage()">Bấm vào để hiện lời chúc</button>
+    <div id="gameArea">
+        <div id="player"></div>
+        <div id="message">
+            Chúc mừng Valentine, bố mẹ!<br>
+            Yêu bố mẹ nhiều! ❤️<br>
+            <span>Con yêu, Duy</span>
+            <button onclick="window.location.reload()">Chơi lại</button>
+        </div>
     </div>
 
-    <!-- Trái tim rơi -->
     <script>
-        // Hàm tạo trái tim rơi
-        function createHeart() {
-            const heart = document.createElement('div');
-            heart.classList.add('heart-fall');
-            heart.style.left = Math.random() * window.innerWidth + 'px';
-            document.body.appendChild(heart);
+        const player = document.getElementById('player');
+        const gameArea = document.getElementById('gameArea');
+        const message = document.getElementById('message');
+        let obstaclesPassed = 0;
 
-            // Xóa trái tim khi rơi xuống dưới màn hình
+        // Hàm nhảy lên
+        function jump() {
+            if (player.classList.contains('jumping')) return;
+
+            player.classList.add('jumping');
+            player.style.transition = 'bottom 0.3s';
+            player.style.bottom = '150px';
+
             setTimeout(() => {
-                heart.remove();
-            }, 5000);
+                player.style.bottom = '0';
+                player.classList.remove('jumping');
+            }, 300);
         }
 
-        // Tạo trái tim mỗi 300ms
-        setInterval(createHeart, 300);
+        // Tạo chướng ngại vật
+        function createObstacle() {
+            const obstacle = document.createElement('div');
+            obstacle.classList.add('obstacle');
+            obstacle.style.right = '0px';
+            gameArea.appendChild(obstacle);
 
-        // Hàm để hiển thị nội dung lời chúc
-        function showMessage() {
-            document.getElementById("message").style.display = "block";
-            document.getElementById("signature").style.display = "block";
+            // Kiểm tra va chạm và nếu vượt qua thì tăng số lượng
+            const obstacleInterval = setInterval(() => {
+                const playerBottom = parseInt(window.getComputedStyle(player).getPropertyValue('bottom'));
+                const obstacleRight = parseInt(window.getComputedStyle(obstacle).getPropertyValue('right'));
+
+                if (obstacleRight > 50 && obstacleRight < 100 && playerBottom <= 30) {
+                    // Người chơi va chạm với chướng ngại vật
+                    clearInterval(obstacleInterval);
+                    alert("Bạn đã thua! Bấm OK để chơi lại.");
+                    window.location.reload();
+                } else if (obstacleRight > window.innerWidth) {
+                    // Nếu vượt qua chướng ngại vật
+                    gameArea.removeChild(obstacle);
+                    obstaclesPassed++;
+                    clearInterval(obstacleInterval);
+
+                    // Kiểm tra nếu đã vượt qua đủ 10 chướng ngại vật
+                    if (obstaclesPassed >= 10) {
+                        message.style.display = 'block';
+                        document.querySelector('button').style.display = 'block';
+                    }
+                }
+            }, 30);
         }
+
+        // Tạo chướng ngại vật mỗi 2 giây
+        setInterval(createObstacle, 2000);
+
+        // Người chơi nhấn phím để nhảy
+        document.addEventListener('keydown', (event) => {
+            if (event.code === 'Space') {
+                jump();
+            }
+        });
     </script>
 </body>
 </html>
