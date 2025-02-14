@@ -159,9 +159,12 @@
     let isJumping = false;
     let isGameOver = false;
     let obstacleInterval;
+    let maxObstacles = 5; // Giới hạn số chướng ngại vật
 
     // Hàm tạo chướng ngại vật
     function createObstacle() {
+        if (obstacleCount >= maxObstacles) return; // Ngừng tạo khi đạt đủ số chướng ngại vật
+
         const obstacle = document.createElement('div');
         obstacle.classList.add('obstacle');
         gameContainer.appendChild(obstacle);
@@ -177,11 +180,11 @@
 
             // Khi vượt qua chướng ngại vật
             if (obstacleRect.right < playerRect.left && !obstacle.isPassed) {
-                obstacleCount++;
                 obstacle.isPassed = true;
+                obstacleCount++;
 
-                // Kiểm tra nếu vượt đủ 5 chướng ngại vật
-                if (obstacleCount >= 5) {
+                // Kiểm tra nếu vượt đủ chướng ngại vật
+                if (obstacleCount >= maxObstacles) {
                     stopGame(obstacleMoveInterval);
                 }
             }
