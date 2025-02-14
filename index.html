@@ -10,61 +10,66 @@
             background-color: #ffcccc;
             margin: 0;
             padding: 0;
-            overflow: hidden;
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
-        }
-
-        #gameArea {
-            position: relative;
-            width: 100%;
-            height: 100%;
-            background-color: #f0f0f0;
             overflow: hidden;
         }
 
-        #player {
-            width: 50px;
-            height: 50px;
-            background-color: #ff0066;
+        .game-container {
+            position: relative;
+            width: 800px;
+            height: 400px;
+            background-color: #fff;
+            border: 3px solid #ff0066;
+            overflow: hidden;
+        }
+
+        .player {
             position: absolute;
             bottom: 0;
             left: 50px;
+            width: 50px;
+            height: 50px;
+            background-color: #ff0066;
+            border-radius: 50%;
         }
 
         .obstacle {
+            position: absolute;
+            bottom: 0;
             width: 30px;
             height: 30px;
             background-color: #333;
-            position: absolute;
-            bottom: 0;
-            animation: moveObstacle 3s linear infinite;
+            right: 0;
+            animation: moveObstacle 2s linear infinite;
         }
 
         @keyframes moveObstacle {
-            from {
-                right: -30px;
-            }
-            to {
-                right: 100vw;
-            }
+            from { right: -30px; }
+            to { right: 100%; }
         }
 
-        #message {
+        .valentine-message {
             display: none;
             position: absolute;
-            top: 40%;
+            top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            font-size: 2em;
-            color: #ff0066;
+            background-color: rgba(255, 255, 255, 0.9);
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
             text-align: center;
+            z-index: 1;
+        }
+
+        h1 {
+            color: #ff0066;
         }
 
         button {
-            display: none;
             background-color: #ff0066;
             color: white;
             border: none;
@@ -75,80 +80,115 @@
             margin-top: 20px;
         }
 
+        button:hover {
+            background-color: #ff3385;
+        }
+
     </style>
 </head>
 <body>
-    <div id="gameArea">
-        <div id="player"></div>
-        <div id="message">
-            Chúc mừng Valentine, bố mẹ!<br>
-            Yêu bố mẹ nhiều! ❤️<br>
-            <span>Con yêu, Duy</span>
-            <button onclick="window.location.reload()">Chơi lại</button>
-        </div>
+
+<div class="game-container" id="gameContainer">
+    <div class="player" id="player"></div>
+    <div class="valentine-message" id="valentineMessage">
+        <h1>Chúc mừng Valentine!</h1>
+        <p>Chúc bố mẹ một ngày Valentine đầy yêu thương và hạnh phúc! Yêu bố mẹ rất nhiều! ❤️</p>
+        <p class="signature">Con yêu, Duy</p>
     </div>
+</div>
 
-    <script>
-        const player = document.getElementById('player');
-        const gameArea = document.getElementById('gameArea');
-        const message = document.getElementById('message');
-        let obstaclesPassed = 0;
+<script>
+    const player = document.getElementById('player');
+    const gameContainer = document.getElementById('gameContainer');
+    const valentineMessage = document.getElementById('valentineMessage');
+    let obstacleCount = 0;
+    let isJumping = false;
+    let isGameOver = false;
 
-        // Hàm nhảy lên
-        function jump() {
-            if (player.classList.contains('jumping')) return;
+    // Hàm tạo chướng ngại vật
+    function createObstacle() {
+        const obstacle = document.createElement('div');
+        obstacle.classList.add('obstacle');
+        gameContainer.appendChild(obstacle);
 
-            player.classList.add('jumping');
-            player.style.transition = 'bottom 0.3s';
-            player.style.bottom = '150px';
+        let obstacleInterval = setInterval(() => {
+            const obstacleRect = obstacle.getBoundingClientRect();
+            const playerRect = player.getBoundingClientRect();
 
-            setTimeout(() => {
-                player.style.bottom = '0';
-                player.classList.remove('jumping');
-            }, 300);
-        }
-
-        // Tạo chướng ngại vật
-        function createObstacle() {
-            const obstacle = document.createElement('div');
-            obstacle.classList.add('obstacle');
-            obstacle.style.right = '0px';
-            gameArea.appendChild(obstacle);
-
-            // Kiểm tra va chạm và nếu vượt qua thì tăng số lượng
-            const obstacleInterval = setInterval(() => {
-                const playerBottom = parseInt(window.getComputedStyle(player).getPropertyValue('bottom'));
-                const obstacleRight = parseInt(window.getComputedStyle(obstacle).getPropertyValue('right'));
-
-                if (obstacleRight > 50 && obstacleRight < 100 && playerBottom <= 30) {
-                    // Người chơi va chạm với chướng ngại vật
-                    clearInterval(obstacleInterval);
-                    alert("Bạn đã thua! Bấm OK để chơi lại.");
-                    window.location.reload();
-                } else if (obstacleRight > window.innerWidth) {
-                    // Nếu vượt qua chướng ngại vật
-                    gameArea.removeChild(obstacle);
-                    obstaclesPassed++;
-                    clearInterval(obstacleInterval);
-
-                    // Kiểm tra nếu đã vượt qua đủ 10 chướng ngại vật
-                    if (obstaclesPassed >= 10) {
-                        message.style.display = 'block';
-                        document.querySelector('button').style.display = 'block';
-                    }
-                }
-            }, 30);
-        }
-
-        // Tạo chướng ngại vật mỗi 2 giây
-        setInterval(createObstacle, 2000);
-
-        // Người chơi nhấn phím để nhảy
-        document.addEventListener('keydown', (event) => {
-            if (event.code === 'Space') {
-                jump();
+            // Kiểm tra va chạm
+            if (!isJumping && obstacleRect.right > playerRect.left && obstacleRect.left < playerRect.right && obstacleRect.bottom > playerRect.top) {
+                gameOver(obstacleInterval);
             }
-        });
-    </script>
+
+            // Khi vượt qua chướng ngại vật
+            if (obstacleRect.right < playerRect.left && !obstacle.isPassed) {
+                obstacleCount++;
+                obstacle.isPassed = true;
+
+                // Kiểm tra nếu vượt đủ 10 chướng ngại vật
+                if (obstacleCount >= 10) {
+                    showValentineMessage(obstacleInterval);
+                }
+            }
+
+            // Xóa chướng ngại vật khi nó đi ra ngoài màn hình
+            if (obstacleRect.right <= 0) {
+                clearInterval(obstacleInterval);
+                obstacle.remove();
+            }
+        }, 20);
+    }
+
+    // Hàm cho nhân vật nhảy
+    function jump() {
+        if (isJumping || isGameOver) return;
+        isJumping = true;
+        let jumpHeight = 0;
+        let jumpInterval = setInterval(() => {
+            if (jumpHeight >= 120) {
+                clearInterval(jumpInterval);
+                let fallInterval = setInterval(() => {
+                    if (jumpHeight <= 0) {
+                        clearInterval(fallInterval);
+                        isJumping = false;
+                    }
+                    jumpHeight -= 5;
+                    player.style.bottom = jumpHeight + 'px';
+                }, 20);
+            }
+            jumpHeight += 5;
+            player.style.bottom = jumpHeight + 'px';
+        }, 20);
+    }
+
+    // Hàm hiển thị lời chúc Valentine
+    function showValentineMessage(obstacleInterval) {
+        valentineMessage.style.display = 'block';
+        clearInterval(obstacleInterval);
+        isGameOver = true;
+        document.removeEventListener('keydown', jumpListener);
+    }
+
+    // Hàm game over
+    function gameOver(obstacleInterval) {
+        alert('Game Over! Bạn đã va phải chướng ngại vật!');
+        isGameOver = true;
+        clearInterval(obstacleInterval);
+        document.removeEventListener('keydown', jumpListener);
+    }
+
+    // Tạo chướng ngại vật mỗi 2 giây
+    const obstacleInterval = setInterval(createObstacle, 2000);
+
+    // Lắng nghe sự kiện phím để cho nhân vật nhảy
+    const jumpListener = (e) => {
+        if (e.code === 'Space' || e.code === 'ArrowUp') {
+            jump();
+        }
+    };
+
+    document.addEventListener('keydown', jumpListener);
+</script>
+
 </body>
 </html>
